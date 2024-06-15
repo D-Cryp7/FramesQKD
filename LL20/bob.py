@@ -69,7 +69,6 @@ class Bob:
 
         return ''.join(measured_bits)
             
-    
     def compute_sifting_string(self, usable_frames):
         sifting_string = []
         for frame in usable_frames:

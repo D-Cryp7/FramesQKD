@@ -151,11 +151,8 @@ class RECOVERED_FRAMES:
         return recovered_frames_and_orientations
              
 
-def attack(usable_frames, sifting_string, measured_string, DEBUG = True):
-    assert len(usable_frames) == len(sifting_string), "Each frame must have its associated sifting bits"
-    assert len(usable_frames) == len(measured_string), "Each frame must have its associated measured bits"
-
-    SS = [ f"{sifting_string[i]},{measured_string[i]}" for i in range(len(usable_frames)) ]
+def attack(usable_frames, SS, DEBUG = True):
+    assert len(usable_frames) == len(SS), "Each frame must have its associated sifting bits"
     
     key_recovered = ["   "] * len(usable_frames)
 
@@ -225,5 +222,6 @@ def attack(usable_frames, sifting_string, measured_string, DEBUG = True):
     if DEBUG:
         print(f"Recovered '11' frames: {orientations}")
         # print(f"Recovered '00' frames: {zero_frames_orientations}")
-    
-    return ''.join(key_recovered), rec
+
+    # return ''.join(key_recovered), rec
+    return ''.join(key_recovered)

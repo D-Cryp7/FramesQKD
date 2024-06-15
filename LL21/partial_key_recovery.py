@@ -28,9 +28,16 @@ def zero_search(recovered_frames, orientations, zero_frames):
                 else: yield f, ("Z", "Z")
     
             
-def attack(usable_frames, sifting_string, conjugate_sifting_string, DEBUG = True):
-    assert len(usable_frames) == len(sifting_string), "Each frame must have its associated sifting bits"
-    assert len(usable_frames) == len(conjugate_sifting_string), "Each frame must have its associated conjugate sifting bits"
+def attack(usable_frames, SS, DEBUG = True):
+    sifting_string = []
+    conjugate_sifting_string = []
+
+    for ss in SS:
+        ss = ss.split(",")
+        sifting_string.append(ss[0])
+        conjugate_sifting_string.append(ss[1])
+    
+    assert len(usable_frames) == len(SS), "Each frame must have its associated sifting bits"
     
     key_recovered = ["  "] * len(usable_frames)
     
