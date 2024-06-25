@@ -1,4 +1,4 @@
-def key_recovery(execute_qkd, Alice, Bob, pairs, Attack, dim, VALID_SS, DEBUG_QKD = False, depolarize_probability = 0, DEBUG_ATCK = False):
+def key_recovery_metrics(execute_qkd, Alice, Bob, pairs, Attack, dim, VALID_SS, DEBUG_QKD = False, depolarize_probability = 0, DEBUG_ATCK = False):
     public, private = execute_qkd(Alice, Bob, pairs, DEBUG_QKD, depolarize_probability)
     
     if not public and not private: return None 

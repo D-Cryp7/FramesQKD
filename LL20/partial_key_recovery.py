@@ -26,46 +26,63 @@ def zero_search(recovered_frames, orientations, zero_frames):
             else:
                 if orientations[s] == ("X", "Z"): yield f, ("X", "X")
                 else: yield f, ("Z", "Z")
+
+def knwon_zero_search(recovered_zero_frames, orientations, frames, O1, OT1, O2, OT2):
+    for s, f in product(recovered_zero_frames, frames):
+        super_frame = s + f
+        index = [i for i in range(2) if super_frame.count(super_frame[i]) > 1] # 2 iterations instead of 4. A super frame always have 4 elements
+        if index:
+            if index[0]:
+                if orientations[s] == ("X", "Z"): yield f, O1
+                else: yield f, OT1
+            else:
+                if orientations[s] == ("X", "Z"): yield f, O2
+                else: yield f, OT2
     
             
 def attack(usable_frames, SS, DEBUG = True):
-    sifting_string = []
-
-    for ss in SS:
-        ss = ss.split(",")
-        sifting_string.append(ss[0])
-    
-    assert len(usable_frames) == len(sifting_string), "Each frame must have its associated sifting bits"
+    assert len(usable_frames) == len(SS), "Each frame must have its associated sifting bits"
     key_recovered = ["  "] * len(usable_frames)
     
     special_frames = []
-    z_frames = []
-    x_frames = []
-    zero_frames = []
-    
+    z_frames_01 = []
+    z_frames_10 = []
+    x_frames_01 = []
+    x_frames_10 = []
+    zero_frames_00 = []
+    zero_frames_11 = []
+
     # fill lists
     for i in range(len(usable_frames)):
-        if sifting_string[i] == "11": special_frames.append(usable_frames[i])
-        elif sifting_string[i] == "01": z_frames.append(usable_frames[i])
-        elif sifting_string[i] == "10": x_frames.append(usable_frames[i])
-        elif sifting_string[i] == "00": zero_frames.append(usable_frames[i])
+        if SS[i] == "11,11": special_frames.append(usable_frames[i])
+        elif SS[i] == "01,01": z_frames_01.append(usable_frames[i])
+        elif SS[i] == "01,10": z_frames_10.append(usable_frames[i])
+        elif SS[i] == "10,01": x_frames_01.append(usable_frames[i])
+        elif SS[i] == "10,10": x_frames_10.append(usable_frames[i])
+        elif SS[i] == "00,00": zero_frames_00.append(usable_frames[i])
+        elif SS[i] == "00,11": zero_frames_11.append(usable_frames[i])
         else: continue
         
     # recover Z frames: (-  1z)
-    recovered_z_frames_and_orientations = set(z_search(special_frames, z_frames))
+    recovered_z_frames_and_orientations = set(z_search(special_frames, z_frames_01 + z_frames_10))
     
     # recover X frames: (1x  -)
-    recovered_x_frames_and_orientations = set(x_search(special_frames, x_frames))
+    recovered_x_frames_and_orientations = set(x_search(special_frames, x_frames_01 + x_frames_10))
+
+    # Same as below (recovered_zero_frames_and_orientations)
+    recovered_xx_frames_and_orientations = set(search(zero_frames_11, x_frames_01 + x_frames_10, ("X", "X")))
+    recovered_zz_frames_and_orientations = set(search(zero_frames_11, z_frames_01 + z_frames_10, ("Z", "Z")))
     
-    recovered_frames_and_orientations = set(list(recovered_z_frames_and_orientations) + list(recovered_x_frames_and_orientations))
+    recovered_frames_and_orientations = set(list(recovered_z_frames_and_orientations) + list(recovered_x_frames_and_orientations) + list(recovered_xx_frames_and_orientations) + list(recovered_zz_frames_and_orientations))
     
     recovered_frames = [ el[0] for el in recovered_frames_and_orientations ]
     orientations = { el[0]: el[1] for el in recovered_frames_and_orientations }
     
-    recovered_zero_frames_and_orientations = set(zero_search(recovered_frames, orientations, zero_frames))
+    recovered_zero_frames_and_orientations = set(zero_search(recovered_frames, orientations, zero_frames_00 + zero_frames_11))
     recovered_zero_frames = [ el[0] for el in recovered_zero_frames_and_orientations ]
     zero_frames_orientations = { el[0]: el[1] for el in recovered_zero_frames_and_orientations }
-    
+
+    recovered_from_known_zero_frames_and_orientations = set(known_zero_search(recovered_zero_frames, zero_frames_orientations, z_frames_01, ))
     
     for i in range(len(usable_frames)):
         if usable_frames[i] in recovered_frames:
