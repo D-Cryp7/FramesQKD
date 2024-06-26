@@ -26,18 +26,6 @@ def zero_search(recovered_frames, orientations, zero_frames):
             else:
                 if orientations[s] == ("X", "Z"): yield f, ("X", "X")
                 else: yield f, ("Z", "Z")
-
-def knwon_zero_search(recovered_zero_frames, orientations, frames, O1, OT1, O2, OT2):
-    for s, f in product(recovered_zero_frames, frames):
-        super_frame = s + f
-        index = [i for i in range(2) if super_frame.count(super_frame[i]) > 1] # 2 iterations instead of 4. A super frame always have 4 elements
-        if index:
-            if index[0]:
-                if orientations[s] == ("X", "Z"): yield f, O1
-                else: yield f, OT1
-            else:
-                if orientations[s] == ("X", "Z"): yield f, O2
-                else: yield f, OT2
     
             
 def attack(usable_frames, SS, DEBUG = True):
@@ -69,7 +57,7 @@ def attack(usable_frames, SS, DEBUG = True):
     # recover X frames: (1x  -)
     recovered_x_frames_and_orientations = set(x_search(special_frames, x_frames_01 + x_frames_10))
 
-    # Same as below (recovered_zero_frames_and_orientations)
+    # Same as below? (recovered_zero_frames_and_orientations)
     recovered_xx_frames_and_orientations = set(search(zero_frames_11, x_frames_01 + x_frames_10, ("X", "X")))
     recovered_zz_frames_and_orientations = set(search(zero_frames_11, z_frames_01 + z_frames_10, ("Z", "Z")))
     
@@ -81,8 +69,6 @@ def attack(usable_frames, SS, DEBUG = True):
     recovered_zero_frames_and_orientations = set(zero_search(recovered_frames, orientations, zero_frames_00 + zero_frames_11))
     recovered_zero_frames = [ el[0] for el in recovered_zero_frames_and_orientations ]
     zero_frames_orientations = { el[0]: el[1] for el in recovered_zero_frames_and_orientations }
-
-    recovered_from_known_zero_frames_and_orientations = set(known_zero_search(recovered_zero_frames, zero_frames_orientations, z_frames_01, ))
     
     for i in range(len(usable_frames)):
         if usable_frames[i] in recovered_frames:
