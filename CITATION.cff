@@ -1,0 +1,8 @@
+@misc{FramesQKD,
+  author = {Daniel Espinoza Figueroa},
+  title = {FramesQKD, Key Recovery attacks on Frame-based QKD protocols},
+  year = {2024},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/D-Cryp7/FramesQKD}}
+}
