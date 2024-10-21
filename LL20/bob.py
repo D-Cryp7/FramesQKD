@@ -14,14 +14,9 @@ class Bob:
         self.backend = Aer.get_backend("qasm_simulator")
 
     def get_noise(self, p, qubits = 1):
-        # This creates the depolarizing error channel,
-        # epsilon(P) = (1-P)rho + (P/3)(XrhoX + YrhoY + ZrhoZ).
-        depo_err_chan = depolarizing_error(4 * p / 3, qubits)
-
-        # Creating the noise model to be used during execution.
+        error = depolarizing_error(p, qubits)
         noise_model = NoiseModel()
-
-        noise_model.add_all_qubit_quantum_error(depo_err_chan, "measure") # measurement error is applied to measurements
+        noise_model.add_all_qubit_quantum_error(error, "measure") # measurement error is applied to measurements
 
         return noise_model
         
@@ -41,7 +36,12 @@ class Bob:
             pairs[i][0].measure(0, 0)
             pairs[i][1].measure(0, 0)
             
-            bits = ''.join([ list(self.backend.run(transpile(circuit, self.backend), noise_model = noise_model).result().get_counts().keys())[0] for circuit in pairs[i] ])
+            bits = ""
+            for circuit in pairs[i]:
+                transpiled = transpile(circuit, self.backend)
+                results = self.backend.run(transpiled, noise_model = noise_model, shots = 1).result().get_counts()
+                # print(results)
+                bits += list(results.keys())[0]
             
             if bits[0] == bits[1]: double_matchings.append(i)
             
